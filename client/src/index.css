@@ -1,0 +1,287 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Luxury car-rental palette — single source of truth for raw CSS
+     (rgba, gradients). Token names kept stable (cream/charcoal/gold/ink)
+     so every existing className in the codebase repaints automatically;
+     only the hex VALUES changed to the emerald/bronze/ivory spec.
+     cream    -> ivory (#faf8f3)
+     charcoal -> deep forest emerald-black (#0f2e28)
+     gold     -> neutral taupe (#7e7667)
+     ink      -> near-black (#1c1c1c) */
+  --cream: #faf8f3;
+  --cream-dim: #f4f0e7;
+  --charcoal: #0f2e28;
+  --gold: #7e7667;
+  --gold-light: #a39a8a;
+  --ink: #1c1c1c;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-cream text-ink font-sans antialiased;
+  font-size: 1.0625rem;
+  line-height: 1.7;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  @apply font-display;
+  font-weight: 600;
+}
+
+::selection {
+  background: rgba(126, 118, 103, 0.3);
+  color: var(--ink);
+}
+
+/* Baseline visible focus state for every interactive element site-wide,
+   so anything not already using .btn-gold/.btn-outline/.field-input
+   still gets a clear, smooth focus ring. */
+a,
+button,
+input,
+select,
+textarea {
+  transition: color 0.2s ease-out, background-color 0.2s ease-out, border-color 0.2s ease-out,
+    box-shadow 0.2s ease-out, opacity 0.2s ease-out;
+}
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid rgba(126, 118, 103, 0.6);
+  outline-offset: 2px;
+}
+
+/* Thin gold-tinted scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--charcoal);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--gold);
+  border-radius: 999px;
+}
+
+@layer components {
+  /*
+   * Glassmorphism — two explicit variants, picked per component based on
+   * what sits BEHIND the glass (never a one-size-fits-all treatment,
+   * since a light tint over a light background reads as almost nothing).
+   *
+   * .glass-dark  — for elements over dark/photographic backdrops
+   *                (Hero video, Why Thonse's charcoal section, the
+   *                scrolled navbar): a white highlight lifted off dark.
+   * .glass-light — for elements over cream/light sections (Fleet,
+   *                Destinations, Reviews, FAQ, forms): a frosted white
+   *                plate with a gold-tinted edge.
+   * Pair either with .glass-card for the shared radius + hover-lift.
+   */
+  .glass-dark {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    /* Drop shadow (spec) + an inset top-edge highlight — the actual visual
+       cue that reads as "glass" (light catching the top edge of a pane)
+       rather than "flat card slightly lighter than its background". */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+  }
+
+  .glass-light {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    border: 1.5px solid rgba(126, 118, 103, 0.55);
+    box-shadow:
+      0 12px 32px rgba(15, 46, 40, 0.12),
+      0 2px 8px rgba(126, 118, 103, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    border-radius: 20px;
+  }
+
+  /* Small pill badges (Hero trust badges, footer badge) always sit on
+     dark backdrops, so .glass is just a radius-free alias of .glass-dark
+     (radius overridden to rounded-full by whichever component uses it). */
+  .glass {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Fleet-card badge pills (SWIFT DZIRE / ERTIGA / A SERVICE, NOT A VEHICLE) —
+     a lighter frosted chip that sits on top of the vehicle photo itself. */
+  .badge-glass {
+    background: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(12px) saturate(160%);
+    -webkit-backdrop-filter: blur(12px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  .glass-card {
+    border-radius: 20px;
+    transition: transform 0.25s ease-out, box-shadow 0.25s ease-out, border-color 0.25s ease-out;
+  }
+
+  .glass-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .glass-card.glass-dark:hover {
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+    border-color: rgba(255, 255, 255, 0.28);
+  }
+
+  .glass-card.glass-light:hover {
+    box-shadow: 0 16px 40px rgba(15, 46, 40, 0.18);
+    border-color: rgba(126, 118, 103, 0.5);
+  }
+
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-gold-gradient
+      px-7 py-3.5 font-sans font-semibold text-charcoal shadow-gold-glow
+      transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-glass-lg
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2
+      active:translate-y-0;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-gold/60
+      bg-transparent px-7 py-3.5 font-sans font-semibold text-cream
+      transition-all duration-200 ease-out hover:bg-gold/10 hover:-translate-y-0.5
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50 focus-visible:ring-offset-2;
+  }
+
+  /* Consistent, visible focus ring for form fields (border-color change
+     alone isn't enough of a signal on its own). */
+  .field-input {
+    @apply transition-colors duration-200 ease-out focus:outline-none focus:border-gold
+      focus:ring-2 focus:ring-gold/30;
+  }
+
+  .section-eyebrow {
+    @apply text-xs sm:text-sm uppercase tracking-[0.3em] text-gold-dark font-semibold;
+  }
+
+  .section-eyebrow-light {
+    @apply text-xs sm:text-sm uppercase tracking-[0.3em] text-gold-light font-semibold;
+  }
+
+  .section-title {
+    @apply mt-3 text-3xl sm:text-4xl md:text-5xl font-display font-semibold leading-tight text-ink;
+  }
+
+  .section-title-light {
+    @apply mt-3 text-3xl sm:text-4xl md:text-5xl font-display font-semibold leading-tight text-cream;
+  }
+
+  .section-sub {
+    @apply mt-4 max-w-2xl text-base text-ink/70 leading-relaxed;
+  }
+
+  .section-sub-light {
+    @apply mt-4 max-w-2xl text-base text-cream/65 leading-relaxed;
+  }
+
+  /* Consistent section rhythm — 40-56px on mobile, 64-80px on desktop. */
+  .section-pad {
+    @apply py-10 sm:py-14 md:py-16 lg:py-20;
+  }
+}
+
+/*
+ * A section's background must never be a single flat solid color behind
+ * glass cards — backdrop-filter blurs whatever's there, and blurring a
+ * flat color just produces the same flat color, so the "glass" reads as
+ * a plain opaque box. These two classes give every glass-card section a
+ * real radial-gradient base with enough color variation for the blur to
+ * visibly do something, replacing the bg-cream/bg-charcoal utility on
+ * that section (don't use both on the same element).
+ */
+/* A single small gradient near the top of a tall section (Fleet, FAQ,
+   Destinations, etc. often run 700-900px+) fades out long before it
+   reaches cards further down, leaving them sitting on a flat color again
+   — same invisible-blur problem, just further down the page. Repeating
+   the glow at multiple depths keeps every card, top to bottom of the
+   section, sitting on real color variation. */
+.section-glow-dark {
+  background: radial-gradient(circle at 20% 10%, rgba(163, 154, 138, 0.5) 0%, rgba(126, 118, 103, 0.18) 22%, transparent 45%),
+    radial-gradient(circle at 85% 15%, rgba(126, 118, 103, 0.3) 0%, transparent 40%),
+    radial-gradient(circle at 15% 55%, rgba(126, 118, 103, 0.22) 0%, transparent 40%),
+    radial-gradient(circle at 90% 60%, rgba(163, 154, 138, 0.25) 0%, transparent 40%),
+    radial-gradient(circle at 25% 95%, rgba(126, 118, 103, 0.28) 0%, transparent 42%),
+    radial-gradient(circle at 80% 100%, rgba(163, 154, 138, 0.2) 0%, transparent 38%),
+    linear-gradient(160deg, #1f3e38 0%, #0f2e28 50%, #0a2923 100%);
+}
+
+.section-glow-light {
+  background: radial-gradient(circle at 20% 10%, rgba(126, 118, 103, 0.38) 0%, rgba(126, 118, 103, 0.14) 22%, transparent 45%),
+    radial-gradient(circle at 85% 15%, rgba(126, 118, 103, 0.22) 0%, transparent 40%),
+    radial-gradient(circle at 15% 55%, rgba(126, 118, 103, 0.18) 0%, transparent 40%),
+    radial-gradient(circle at 90% 60%, rgba(15, 46, 40, 0.1) 0%, transparent 40%),
+    radial-gradient(circle at 25% 95%, rgba(126, 118, 103, 0.22) 0%, transparent 42%),
+    radial-gradient(circle at 80% 100%, rgba(126, 118, 103, 0.16) 0%, transparent 38%),
+    #f4f0e7;
+}
+
+/* Destinations section specifically — a deeper pearl base than the
+   default .section-glow-light gives the glass-light cards (already
+   near-white at 0.65 opacity) more room to visibly stand out against. */
+.section-glow-destinations {
+  background: radial-gradient(circle at 50% 0%, rgba(126, 118, 103, 0.15), transparent 55%), #ebe6d9;
+}
+
+/* Full-page fade on route change — avoids a hard white-flash cut. */
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.page-transition {
+  animation: page-fade-in 0.4s ease-out;
+}
+
+/* Scroll-reveal: JS toggles .is-visible via IntersectionObserver */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .animate-float {
+    animation: none !important;
+  }
+}
