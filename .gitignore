@@ -4,7 +4,11 @@ server/node_modules/
 .env
 client/.env
 server/.env
+client/server/.env
 server/data/bookings.json
 server/data/contact.json
+client/server/data/*.json
+!client/server/data/fleetSeedData.js
 dist/
+client/dist/
 .DS_Store
