@@ -285,3 +285,16 @@ textarea:focus-visible {
     animation: none !important;
   }
 }
+
+/* Prevent browser video popout / PiP / media overlay hover controls */
+video {
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+video::-webkit-media-controls {
+  display: none !important;
+}
+video::-webkit-media-controls-enclosure {
+  display: none !important;
+}

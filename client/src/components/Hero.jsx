@@ -114,19 +114,14 @@ function CyclingVideoBackground() {
             // so its box size never actually depends on the video's own
             // intrinsic dimensions and there's no real CLS risk here).
             style={{ aspectRatio: "9 / 16" }}
-            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[600ms] ease-in-out ${
+            className={`pointer-events-none select-none absolute inset-0 h-full w-full object-cover transition-opacity duration-[600ms] ease-in-out ${
               isFront ? "z-10 opacity-100" : "z-0 opacity-0"
             }`}
             src={isMobile ? clip.mobileSrc : clip.src}
             poster={clip.poster}
-            // Only the currently-visible clip preloads/plays eagerly on
-            // mobile — the back layer (buffering the *next* clip ahead of
-            // its turn) drops to "metadata" there so it isn't competing for
-            // bandwidth on a constrained mobile connection; it loads and
-            // starts on demand instead, via the effect above, the instant
-            // it becomes front. Desktop keeps both eager/auto-playing, since
-            // that's what makes the crossfade seamless and bandwidth isn't
-            // the bottleneck there.
+            disablePictureInPicture
+            disableRemotePlayback
+            controlsList="nodownload nofullscreen noremoteplayback"
             preload={isFront || !isMobile ? "auto" : "metadata"}
             fetchPriority={isFront ? "high" : "auto"}
             autoPlay={isFront || !isMobile}

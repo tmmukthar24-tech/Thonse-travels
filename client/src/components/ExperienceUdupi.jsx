@@ -42,16 +42,21 @@ export default function ExperienceUdupi() {
                 style={{ animationDuration: clip.floatDuration, animationDelay: clip.floatDelay }}
               >
                 <div className="glass-light overflow-hidden rounded-3xl p-3">
-                  <div className="overflow-hidden rounded-2xl">
+                  <div className="relative overflow-hidden rounded-2xl">
                     <video
-                      className="h-64 w-full object-cover sm:h-80"
+                      className="pointer-events-none h-64 w-full object-cover select-none sm:h-80"
                       src={clip.src}
                       autoPlay
                       muted
                       loop
                       playsInline
+                      disablePictureInPicture
+                      disableRemotePlayback
+                      controlsList="nodownload nofullscreen noremoteplayback"
                       aria-label={clip.caption}
                     />
+                    {/* Transparent overlay shield preventing browser video pop-out/hover buttons */}
+                    <div className="absolute inset-0 pointer-events-auto" aria-hidden="true" />
                   </div>
                   <p className="mt-3 px-2 pb-1 text-center font-display text-base font-medium text-ink">
                     {clip.caption}
