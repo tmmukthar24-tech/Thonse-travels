@@ -7,21 +7,25 @@ let dbConnected = false;
  * Controllers use this to decide between the Mongo-backed models
  * and the local JSON file fallback.
  */
-export const isDbConnected = () => dbConnected;
+export const isDbConnected = () => dbConnected && mongoose.connection.readyState === 1;
 
 export async function connectDB() {
+  if (mongoose.connection.readyState === 1) {
+    dbConnected = true;
+    return true;
+  }
+
   const uri = process.env.MONGO_URI;
 
   if (!uri) {
-    console.log(
-      "[db] No MONGO_URI set — running on local JSON file storage fallback."
-    );
     dbConnected = false;
     return false;
   }
 
   try {
-    await mongoose.connect(uri);
+    await mongoose.connect(uri, {
+      serverSelectionTimeoutMS: 5000,
+    });
     dbConnected = true;
     console.log("[db] MongoDB connected successfully.");
 

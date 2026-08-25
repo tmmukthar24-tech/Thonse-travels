@@ -1,52 +1,23 @@
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
-
+import app from "./app.js";
 import { connectDB } from "./config/db.js";
-import fleetRoutes from "./routes/fleetRoutes.js";
-import bookingRoutes from "./routes/bookingRoutes.js";
-import contactRoutes from "./routes/contactRoutes.js";
-import chatbotRoutes from "./routes/chatbotRoutes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load .env from server directory, client root, or parent root
-dotenv.config();
-dotenv.config({ path: path.resolve(__dirname, "../.env") });
-dotenv.config({ path: path.resolve(__dirname, "../../.env") });
-
-const app = express();
-
-app.use(cors());
-app.use(express.json());
-
-// API health endpoint
-app.get("/api/health", (req, res) => {
-  res.json({ status: "ok", service: "thonse-travels-server" });
-});
-
-// API Routes
-app.use("/api/fleet", fleetRoutes);
-app.use("/api/bookings", bookingRoutes);
-app.use("/api/contact", contactRoutes);
-app.use("/api/chatbot", chatbotRoutes);
-
-// Catch unhandled API routes specifically
-app.all("/api/*", (req, res) => {
-  res.status(404).json({ message: "API route not found" });
-});
-
 // Serve client production build if dist directory exists
 const distPath = path.resolve(__dirname, "../dist");
 if (fs.existsSync(distPath)) {
-  app.use(express.static(distPath));
+  app.use(expressStaticGzipFallback(distPath));
 
   // SPA fallback for client-side routing
   app.get("*", (req, res) => {
+    // If it's an unhandled API route, return 404 JSON instead of index.html
+    if (req.path.startsWith("/api/")) {
+      return res.status(404).json({ message: "API route not found" });
+    }
     res.sendFile(path.join(distPath, "index.html"));
   });
 } else {
@@ -55,6 +26,18 @@ if (fs.existsSync(distPath)) {
       "Thonse Tours & Travels API is running. Client build not found — run 'npm run build' to generate frontend assets."
     );
   });
+}
+
+function expressStaticGzipFallback(dir) {
+  // Simple static file serving middleware
+  return (req, res, next) => {
+    if (req.path.startsWith("/api/")) return next();
+    const filePath = path.join(dir, req.path);
+    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+      return res.sendFile(filePath);
+    }
+    next();
+  };
 }
 
 // Global error handler
